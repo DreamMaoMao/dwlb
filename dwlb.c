@@ -1861,26 +1861,13 @@ int main(int argc, char **argv) {
       (ipc && !dwl_wm))
     DIE("Compositor does not support all needed protocols");
 
-  // OLD: Font scaling
-  /* // Load selected font
-  // fcft_init(FCFT_LOG_COLORIZE_AUTO, 0, FCFT_LOG_CLASS_ERROR);
-  // OLD: deprecated
-  // fcft_set_scaling_filter(FCFT_SCALING_FILTER_LANCZOS3);
-  //
-  // unsigned int dpi = 96 * buffer_scale;
-  // char buf[10];
-  // snprintf(buf, sizeof buf, "dpi=%u", dpi);
-  // if (!(font = fcft_from_name(1, (const char *[]){fontstr}, buf)))
-  //   DIE("Could not load font");
-  // textpadding = font->height / 2; */
+
+  // Updated deprecated fcft font scaling
 
   /* Load selected font */
   fcft_init(FCFT_LOG_COLORIZE_AUTO, 0, FCFT_LOG_CLASS_ERROR);
-  // fcft_set_scaling_filter(FCFT_SCALING_FILTER_LANCZOS3); // <-- REMOVED THIS
-  // LINE
 
-  // unsigned int dpi = 96 * buffer_scale;
-  unsigned int dpi = 96;
+  unsigned int dpi = 96 * buffer_scale;
   char buf[10];
   snprintf(buf, sizeof buf, "dpi=%u",
            dpi); // <-- Keep this, 'attributes' string is still used for DPI
@@ -1893,7 +1880,7 @@ int main(int argc, char **argv) {
   if (!(font = fcft_from_name2(1, (const char *[]){fontstr}, buf, options)))
     DIE("Could not load font");
 
-  fcft_font_options_destroy(options); // <-- Clean up the options struct
+  fcft_font_options_destroy(options);
   textpadding = font->height / 2;
 
   height = font->height / buffer_scale + vertical_padding * 2;
