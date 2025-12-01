@@ -3,7 +3,9 @@
 My fork of [dwlb](https://github.com/kolunmi/dwlb), a fast, feature-complete bar for [dwl](https://github.com/djpohly/dwl).
 
 <div align="center">
+
 ![screenshot 1](./docs/screenshot1.png "screenshot1")
+
 </div>
 
 ## Fork Features
