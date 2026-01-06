@@ -175,6 +175,7 @@ typedef struct {
 
   uint32_t mtags, ctags, urg, sel;
   char *layout, *window_title;
+  char *appid;
   uint32_t layout_idx, last_layout_idx;
   CustomText title, status;
 
@@ -854,6 +855,28 @@ static void hide_bar(Bar *bar) {
   bar->hidden = true;
 }
 
+// ADDED: function to check the conditions and toggle visibility of bar
+static void check_auto_hide(Bar *bar) {
+  // If no title or appid (empty tag), default to show the bar
+  if (!bar->window_title || !bar->appid) {
+    if (bar->hidden)
+      show_bar(bar);
+    return;
+  }
+
+  bool is_terminal =
+      (strcmp(bar->appid, "foot") == 0 || strcmp(bar->appid, "kitty") == 0);
+  bool is_tmux = (strstr(bar->window_title, "tmux") != NULL);
+
+  if (is_terminal && is_tmux) {
+    if (!bar->hidden)
+      hide_bar(bar);
+  } else {
+    if (bar->hidden)
+      show_bar(bar);
+  }
+}
+
 static void dwl_wm_tags(void *data, struct zdwl_ipc_manager_v2 *dwl_wm,
                         uint32_t amount) {
   if (!tags && !(tags = malloc(amount * sizeof(char *))))
@@ -914,6 +937,21 @@ static void dwl_wm_output_tag(void *data,
     bar->urg |= 1 << tag;
   else
     bar->urg &= ~(1 << tag);
+
+  // ADDED: If a tag becomes active, invalidate the cached title/appid
+  // This forces the bar to show immediately. Then auto-hide logic is
+  // triggered, hiding if checks pass
+  if (state & ZDWL_IPC_OUTPUT_V2_TAG_STATE_ACTIVE) {
+    if (bar->window_title) {
+      free(bar->window_title);
+      bar->window_title = NULL;
+    }
+    if (bar->appid) {
+      free(bar->appid);
+      bar->appid = NULL;
+    }
+    check_auto_hide(bar);
+  }
 }
 
 static void dwl_wm_output_layout(void *data,
@@ -928,8 +966,11 @@ static void dwl_wm_output_layout(void *data,
 static void dwl_wm_output_title(void *data,
                                 struct zdwl_ipc_output_v2 *dwl_wm_output,
                                 const char *title) {
-  if (custom_title)
-    return;
+  // REMOVED: so bar->window_title is always populated for auto-hide logic.
+  // The drawing logic in draw_frame already handles custom_title correctly
+  // by choosing which text to render.
+  /* if (custom_title)
+     return; */
 
   Bar *bar = (Bar *)data;
 
@@ -937,11 +978,24 @@ static void dwl_wm_output_title(void *data,
     free(bar->window_title);
   if (!(bar->window_title = strdup(title)))
     EDIE("strdup");
+
+  // ADDED: Check visibility based on new title
+  check_auto_hide(bar);
 }
 
 static void dwl_wm_output_appid(void *data,
                                 struct zdwl_ipc_output_v2 *dwl_wm_output,
-                                const char *appid) {}
+                                const char *appid) {
+  // ADDED: was empty, now stores the appid and calls the check for auto-hide.
+  Bar *bar = (Bar *)data;
+
+  if (bar->appid)
+    free(bar->appid);
+  if (!(bar->appid = strdup(appid)))
+    EDIE("strdup");
+
+  check_auto_hide(bar);
+}
 
 static void dwl_wm_output_layout_symbol(
     void *data, struct zdwl_ipc_output_v2 *dwl_wm_output, const char *layout) {
@@ -1054,6 +1108,10 @@ static void teardown_bar(Bar *bar) {
     free(bar->title.buttons);
   if (bar->window_title)
     free(bar->window_title);
+  // ADDED: check appid for auto-hide
+
+  if (bar->appid)
+    free(bar->appid);
   if (!ipc && bar->layout)
     free(bar->layout);
   if (ipc)
