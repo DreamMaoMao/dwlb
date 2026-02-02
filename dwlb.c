@@ -1074,7 +1074,7 @@ static void handle_global(void *data, struct wl_registry *registry,
   } else if (!strcmp(interface, zdwl_ipc_manager_v2_interface.name)) {
     if (ipc) {
       dwl_wm =
-          wl_registry_bind(registry, name, &zdwl_ipc_manager_v2_interface, 2);
+          wl_registry_bind(registry, name, &zdwl_ipc_manager_v2_interface, 1);
       zdwl_ipc_manager_v2_add_listener(dwl_wm, &dwl_wm_listener, NULL);
     }
   } else if (!strcmp(interface, wl_output_interface.name)) {
