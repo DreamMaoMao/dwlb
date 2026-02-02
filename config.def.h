@@ -25,20 +25,20 @@ static bool active_color_title = true;
 // scale
 static uint32_t buffer_scale = 1;
 // font
-static char *fontstr = "FiraMono Nerd Font Mono:size=18";
+static char *fontstr = "Maple Mono NF CN:style=Bold:size=18";
 // tag names
 static char *tags_names[] = {"1", "2", "3", "4",   "5",  "6",
                              "7", "8", "9", "pad", "prv"};
 
 // set 16-bit colors for bar
 // use either pixman_color_t struct or HEX_COLOR macro for 8-bit colors
-static pixman_color_t active_fg_color = HEX_COLOR(0xDBD0C6ff);
-static pixman_color_t active_bg_color = HEX_COLOR(0x8A7FA3ff);
-static pixman_color_t occupied_fg_color = HEX_COLOR(0x8A7FA3ff);
-static pixman_color_t occupied_bg_color = HEX_COLOR(0x111012ff);
-static pixman_color_t inactive_fg_color = HEX_COLOR(0x756D85ff);
-static pixman_color_t inactive_bg_color = HEX_COLOR(0x111012ff);
-static pixman_color_t urgent_fg_color = HEX_COLOR(0x111012ff);
+static pixman_color_t active_fg_color = HEX_COLOR(0x111012ff);
+static pixman_color_t active_bg_color = HEX_COLOR(0x718b80ff);
+static pixman_color_t occupied_fg_color = HEX_COLOR(0xc3b695ff);
+static pixman_color_t occupied_bg_color = HEX_COLOR(0x201B14ff);
+static pixman_color_t inactive_fg_color = HEX_COLOR(0xC68A93ff);
+static pixman_color_t inactive_bg_color = HEX_COLOR(0x201B14ff);
+static pixman_color_t urgent_fg_color = HEX_COLOR(0x201B14ff);
 static pixman_color_t urgent_bg_color = HEX_COLOR(0xDBD0C6ff);
-static pixman_color_t middle_bg_color = HEX_COLOR(0x111012ff);
-static pixman_color_t middle_bg_color_selected = HEX_COLOR(0x111012ff);
+static pixman_color_t middle_bg_color = HEX_COLOR(0x201B14ff);
+static pixman_color_t middle_bg_color_selected = HEX_COLOR(0x201B14ff);
