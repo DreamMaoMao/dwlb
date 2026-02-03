@@ -4,13 +4,21 @@ MANS = dwlb.1
 PREFIX ?= /usr/local
 CFLAGS += -Wall -Wextra -Wno-unused-parameter -Wno-format-truncation -g
 
+PROTOCOL_HEADERS = xdg-shell-protocol.h xdg-output-unstable-v1-protocol.h wlr-layer-shell-unstable-v1-protocol.h dwl-ipc-unstable-v2-protocol.h
+PROTOCOL_SOURCES = xdg-shell-protocol.c xdg-output-unstable-v1-protocol.c wlr-layer-shell-unstable-v1-protocol.c dwl-ipc-unstable-v2-protocol.c
+PROTOCOL_OBJS = xdg-shell-protocol.o xdg-output-unstable-v1-protocol.o wlr-layer-shell-unstable-v1-protocol.o dwl-ipc-unstable-v2-protocol.o
+
 all: $(BINS)
 
 config.h:
 	cp config.def.h $@
 
 clean:
-	$(RM) $(BINS) $(addsuffix .o,$(BINS))
+	$(RM) $(BINS) $(addsuffix .o,$(BINS)) $(PROTOCOL_OBJS) $(PROTOCOL_HEADERS) $(PROTOCOL_SOURCES) config.h
+
+uninstall:
+	$(RM) $(PREFIX)/bin/dwlb
+	$(RM) $(PREFIX)/share/man/man1/dwlb.1
 
 install: all
 	install -D -t $(PREFIX)/bin $(BINS)
@@ -46,10 +54,10 @@ dwl-ipc-unstable-v2-protocol.o: dwl-ipc-unstable-v2-protocol.h
 dwlb.o: utf8.h config.h xdg-shell-protocol.h xdg-output-unstable-v1-protocol.h wlr-layer-shell-unstable-v1-protocol.h dwl-ipc-unstable-v2-protocol.h
 
 # Protocol dependencies
-dwlb: xdg-shell-protocol.o xdg-output-unstable-v1-protocol.o wlr-layer-shell-unstable-v1-protocol.o dwl-ipc-unstable-v2-protocol.o
+dwlb: $(PROTOCOL_OBJS)
 
 # Library dependencies
 dwlb: CFLAGS+=$(shell pkg-config --cflags wayland-client wayland-cursor fcft pixman-1)
 dwlb: LDLIBS+=$(shell pkg-config --libs wayland-client wayland-cursor fcft pixman-1) -lrt
 
-.PHONY: all clean install
+.PHONY: all clean install uninstall
